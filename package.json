@@ -1,0 +1,32 @@
+{
+  "name": "inversify-sample-app",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "prebundle": "mkdir -p dist",
+    "bundle": "webpack && cp ./src/index.html ./dist/",
+    "postinstall": "typings install",
+    "start": "npm run bundle && ./node_modules/node-static/bin/cli.js dist -p 8001 -H '{\"Cache-Control\": \"no-cache, must-revalidate\"}'"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "3.0.0-beta.17",
+    "inversify": "3.0.0-rc.2",
+    "inversify-inject-decorators": "3.0.0-beta.2",
+    "lodash": "4.17.3",
+    "node-static": "0.7.9",
+    "preact": "7.1.0",
+    "react": "15.4.1",
+    "react-dom": "15.4.1",
+    "react-router": "3.0.0",
+    "redux": "3.6.0",
+    "redux-loop": "2.2.2",
+    "reflect-metadata": "0.1.8",
+    "source-map-loader": "0.1.5",
+    "tslib": "1.2.0",
+    "tslint": "4.1.1",
+    "typescript": "2.1.4",
+    "typings": "2.1.0",
+    "webpack": "1.14.0",
+    "whatwg-fetch": "^2.0.2"
+  }
+}
