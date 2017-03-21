@@ -5,10 +5,11 @@ import {
     Router,
 } from 'react-router';
 
-import { LibrariesPage } from './cdnLibraries/LibrariesPage';
+import { SearchPanel } from './cdnLibraries/search/SearchPanel';
+import { containerComponent } from './sharedComponents/ContainerComponent';
 
 export const routes = (
     <Router history={ hashHistory }>
-        <Route path='/' component={LibrariesPage}/>
+        <Route path='/' component={containerComponent(s => s.search, SearchPanel)}/>
     </Router>
 );

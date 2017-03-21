@@ -2,11 +2,11 @@ import * as React from 'react';
 
 import { lazyInject } from '../../container';
 import { Input } from '../../sharedComponents/forms/Input';
-import { GlobalModel } from '../../sharedModels/globalModel';
 import { SearchActions } from './actions';
 import { SearchApiResult } from './api';
+import { SearchState } from './model';
 
-export class SearchPanel extends React.Component<GlobalModel, {}> {
+export class SearchPanel extends React.Component<SearchState, {}> {
     @lazyInject(SearchActions)
     private actions: SearchActions;
 
@@ -16,7 +16,7 @@ export class SearchPanel extends React.Component<GlobalModel, {}> {
                 <h2>Search CDNJS libraries</h2>
                 <Input
                     onChange={ ev => this.actions.searchLibraries(ev.target.value) }
-                    value={this.props.search.phrase}
+                    value={this.props.phrase}
                     placeholder='Type something to search...'
                     />
                 {this.renderResults()}
@@ -25,7 +25,7 @@ export class SearchPanel extends React.Component<GlobalModel, {}> {
     }
 
     private renderResults() {
-        const { results } = this.props.search;
+        const { results } = this.props;
         if (results.length === 0) {
             return null;
         }

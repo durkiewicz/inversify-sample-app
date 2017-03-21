@@ -24,7 +24,7 @@
     "source-map-loader": "0.1.5",
     "tslib": "1.2.0",
     "tslint": "4.1.1",
-    "typescript": "2.1.4",
+    "typescript": "2.2.1",
     "typings": "2.1.0",
     "webpack": "1.14.0",
     "whatwg-fetch": "^2.0.2"

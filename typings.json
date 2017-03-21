@@ -10,7 +10,6 @@
     "react-router": "registry:npm/react-router#2.4.0+20160915183637"
   },
   "globalDevDependencies": {
-    "node": "registry:env/node#6.0.0+20170213133316",
-    "whatwg-fetch": "registry:dt/whatwg-fetch#0.0.0+20161120230953"
+    "node": "registry:env/node#6.0.0+20170213133316"
   }
 }
