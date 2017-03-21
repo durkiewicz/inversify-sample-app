@@ -2,9 +2,9 @@ import { Effect } from 'redux-loop';
 
 import { GlobalModel } from './globalModel';
 
-export type ReducingFunction<T> = f.Func2<GlobalModel, T, GlobalModel | [GlobalModel, Effect]>;
+export type ReducingFunction<ActionPayload> = f.Func2<GlobalModel, ActionPayload, GlobalModel | [GlobalModel, Effect]>;
 
-export interface ReducerContributor<T> {
+export interface ReducerContributor<ActionPayload> {
     actionType: symbol;
-    reduce: ReducingFunction<T>;
+    reduce: ReducingFunction<ActionPayload>;
 }

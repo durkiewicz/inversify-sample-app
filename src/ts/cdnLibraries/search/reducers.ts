@@ -24,11 +24,10 @@ export class ChangeSearchPhraseReducer implements ReducerContributor<string> {
 
     private effect(phrase: string) {
         if (phrase.length > 2) {
-            return Effects.promise(
-                () =>
-                    this.api.search(phrase)
-                        .then(searchLibrariesSuccess),
-                null);
+            return Effects.promise(() =>
+                this.api.search(phrase)
+                    .then(searchLibrariesSuccess),
+            );
         }
         return Effects.none();
     }
