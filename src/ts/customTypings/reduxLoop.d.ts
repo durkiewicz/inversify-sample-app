@@ -20,7 +20,7 @@ declare module 'redux-loop' {
 
     function loop<S>(state: S, effect: Effect): [S, Effect];
 
-    function isLoop<S>(potentialLoop: any): potentialLoop is [S, Effect];
+    function isLoop<S>(potentialLoop: S | [S, Effect]): potentialLoop is [S, Effect];
 
     namespace Effects {
         interface PromiseEffectFactory {
