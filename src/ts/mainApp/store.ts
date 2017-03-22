@@ -8,8 +8,7 @@ import { mainAppTypes } from './types';
 
 @injectable()
 export class Store {
-    // TODO: remove static
-    private static storeValue: ReduxStore<any> | undefined;
+    private storeOrNull: ReduxStore<any> | undefined;
 
     constructor(
         @inject(mainAppTypes.MainReducer)
@@ -18,10 +17,10 @@ export class Store {
     }
 
     private get store() {
-        if (Store.storeValue == null) {
-            Store.storeValue = createStore(this.mainReducer.getReducer(), initialGlobalModel, install());
+        if (this.storeOrNull == null) {
+            this.storeOrNull = createStore(this.mainReducer.getReducer(), initialGlobalModel, install());
         }
-        return Store.storeValue;
+        return this.storeOrNull;
     }
 
     public dispatch<T extends Action>(action: T) {

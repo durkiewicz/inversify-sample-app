@@ -2,23 +2,23 @@ import { injectable } from 'inversify';
 import * as _ from 'lodash';
 import { Effects, loop } from 'redux-loop';
 
-import { GlobalModel } from '../../sharedModels/globalModel';
-import { ReducerContributor } from '../../sharedModels/reducers';
+import { ReducerContributorDepth1 } from '../../sharedModels/reducers';
 import { CHANGE_SEARCH_PHRASE, SEARCH_LIBRARIES, searchLibrariesSuccess } from './actions';
 import { SearchApi, SearchApiResults } from './api';
+import { SearchState } from './model';
 
 @injectable()
-export class ChangeSearchPhraseReducer implements ReducerContributor<string> {
+export class ChangeSearchPhraseReducer implements ReducerContributorDepth1<string, 'search'> {
     public readonly actionType = CHANGE_SEARCH_PHRASE;
+    public readonly selector = 'search';
 
     constructor(
         private api: SearchApi,
     ) { }
 
-    public reduce(model: GlobalModel, phrase: string) {
+    public reduce(model: SearchState, phrase: string) {
         const result = _.clone(model);
-        result.search = _.clone(result.search);
-        result.search.phrase = phrase;
+        result.phrase = phrase;
         return loop(result, this.effect(phrase));
     }
 
@@ -34,13 +34,13 @@ export class ChangeSearchPhraseReducer implements ReducerContributor<string> {
 }
 
 @injectable()
-export class SearchLibrariesSuccessReducer implements ReducerContributor<SearchApiResults> {
+export class SearchLibrariesSuccessReducer implements ReducerContributorDepth1<SearchApiResults, 'search'> {
     public readonly actionType = SEARCH_LIBRARIES.succeed;
+    public readonly selector = 'search';
 
-    public reduce(model: GlobalModel, results: SearchApiResults) {
+    public reduce(model: SearchState, results: SearchApiResults) {
         const result = _.clone(model);
-        result.search = _.clone(result.search);
-        result.search.results = results.results;
+        result.results = results.results;
         return result;
     }
 }

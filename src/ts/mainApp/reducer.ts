@@ -1,11 +1,12 @@
-import { injectable, multiInject } from 'inversify';
+import { injectable, multiInject, optional } from 'inversify';
 import { Effect, Effects, loop } from 'redux-loop';
 
 import { GenericAction } from '../sharedModels/actions';
 import { GlobalModel, initialGlobalModel } from '../sharedModels/globalModel';
-import { ReducerContributor, ReducingFunction } from '../sharedModels/reducers';
+import { ReducerContributor, ReducerContributorDepth1, ReducingFunction } from '../sharedModels/reducers';
 import { sharedTypes } from '../sharedModels/types';
 import * as Optional from '../utils/Optional';
+import { ReducerAdapter } from './ReducerAdapter';
 
 type Loop = [GlobalModel, Effect];
 
@@ -16,7 +17,7 @@ const performReduction = (actionPayload: any) => (acc: Loop, f: ReducingFunction
         const [newState, effect] = result;
         return loop(newState, Effects.batch([ oldEffect, effect]));
     }
-    return [result, Effects.none()] as Loop;
+    return loop(result, Effects.none());
 };
 
 @injectable()
@@ -24,8 +25,11 @@ export class MainReducer {
     private mapOfReducersOrNull: Map<symbol, ReducingFunction<any>[]> | null;
 
     constructor(
-        @multiInject(sharedTypes.ReducerContributor)
+        private adapter: ReducerAdapter,
+        @optional() @multiInject(sharedTypes.ReducerContributor)
         private contributors: ReducerContributor<any>[],
+        @optional() @multiInject(sharedTypes.ReducerContributorDepth1)
+        private contributors1: ReducerContributorDepth1<any, any>[],
     ) {
     }
 
@@ -35,7 +39,7 @@ export class MainReducer {
                 .map(functions =>
                     functions.reduce(
                         performReduction(action.payload),
-                        [state, Effects.none()] as [GlobalModel, Effect],
+                        loop(state, Effects.none()),
                     ),
                 )
                 .orElse([state, Effects.none()]);
@@ -50,11 +54,16 @@ export class MainReducer {
 
     private buildMapOfReducers() {
         const result = new Map<symbol, ReducingFunction<any>[]>();
-        this.contributors.forEach(c => {
+        this.allContributors.forEach(c => {
             const functions = Optional.ofNullable(result.get(c.actionType))
                 .orElse([]);
             result.set(c.actionType, functions.concat(c.reduce.bind(c)));
         });
         return result;
+    }
+
+    private get allContributors() {
+        return this.contributors
+            .concat(this.contributors1.map(this.adapter.adaptDepth1, this));
     }
 }
