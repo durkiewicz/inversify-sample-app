@@ -1,9 +1,9 @@
 import { injectable, multiInject, optional } from 'inversify';
-import { Effect, Effects, loop } from 'redux-loop';
+import { Effect, Effects, isLoop, loop } from 'redux-loop';
 
 import { GenericAction } from '../sharedModels/actions';
 import { GlobalModel, initialGlobalModel } from '../sharedModels/globalModel';
-import { ReducerContributor, ReducerContributorDepth1, ReducingFunction } from '../sharedModels/reducers';
+import { ReducerContributor, ReducerContributorDepth1, ReducerContributorDepth2, ReducingFunction } from '../sharedModels/reducers';
 import { sharedTypes } from '../sharedModels/types';
 import * as Optional from '../utils/Optional';
 import { ReducerAdapter } from './ReducerAdapter';
@@ -13,7 +13,7 @@ type Loop = [GlobalModel, Effect];
 const performReduction = (actionPayload: any) => (acc: Loop, f: ReducingFunction<any>) => {
     const [oldState, oldEffect] = acc;
     const result = f(oldState, actionPayload);
-    if (result instanceof Array) {
+    if (isLoop(result)) {
         const [newState, effect] = result;
         return loop(newState, Effects.batch([ oldEffect, effect]));
     }
@@ -30,12 +30,19 @@ export class MainReducer {
         private contributors: ReducerContributor<any>[],
         @optional() @multiInject(sharedTypes.ReducerContributorDepth1)
         private contributors1: ReducerContributorDepth1<any, any>[],
+        @optional() @multiInject(sharedTypes.ReducerContributorDepth2)
+        private contributors2: ReducerContributorDepth2<any, any, any>[],
     ) {
     }
 
     public getReducer() {
-        return (state = initialGlobalModel, action: GenericAction<any>) =>
-            Optional.ofNullable(this.mapOfReducers.get(action.type))
+        return (state = initialGlobalModel, action: GenericAction<any>) => {
+            console.groupCollapsed(`action ${ action.type.toString() }`);
+            console.log('payload:');
+            console.log(action.payload);
+            console.log('old state:');
+            console.log(state);
+            const result = Optional.ofNullable(this.mapOfReducers.get(action.type))
                 .map(functions =>
                     functions.reduce(
                         performReduction(action.payload),
@@ -43,6 +50,11 @@ export class MainReducer {
                     ),
                 )
                 .orElse([state, Effects.none()]);
+            console.log('new state:');
+            console.log(result);
+            console.groupEnd();
+            return result;
+        };
     }
 
     private get mapOfReducers() {
@@ -64,6 +76,7 @@ export class MainReducer {
 
     private get allContributors() {
         return this.contributors
-            .concat(this.contributors1.map(this.adapter.adaptDepth1, this));
+            .concat(this.contributors1.map(c1 => this.adapter.adaptDepth1(c1)))
+            .concat(this.contributors2.map(c2 => this.adapter.adaptDepth2(c2)));
     }
 }

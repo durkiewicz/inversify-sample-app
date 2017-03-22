@@ -18,7 +18,9 @@ declare module 'redux-loop' {
     type Enhancer = (store: StoreCreator) => EnhancedStoreCreator;
     function install(): StoreEnhancer<any>;
 
-    function loop<S>(state: S, effect: Effect): [S, Effect]
+    function loop<S>(state: S, effect: Effect): [S, Effect];
+
+    function isLoop<S>(potentialLoop: any): potentialLoop is [S, Effect];
 
     namespace Effects {
         interface PromiseEffectFactory {

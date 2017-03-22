@@ -11,8 +11,14 @@ export interface ReducerContributor<ActionPayload> {
     reduce: ReducingFunction<ActionPayload>;
 }
 
-export interface ReducerContributorDepth1<ActionPayload, T extends keyof GlobalModel> {
+export interface ReducerContributorDepth1<ActionPayload, K extends keyof GlobalModel> {
     actionType: symbol;
-    selector: T;
-    reduce: GeneralReducingFunction<ActionPayload, GlobalModel[T]>;
+    selector: K;
+    reduce: GeneralReducingFunction<ActionPayload, GlobalModel[K]>;
+}
+
+export interface ReducerContributorDepth2<ActionPayload, K1 extends keyof GlobalModel, K2 extends keyof GlobalModel[K1]> {
+    actionType: symbol;
+    selector: [K1, K2];
+    reduce: GeneralReducingFunction<ActionPayload, GlobalModel[K1][K2]>;
 }

@@ -1,25 +1,21 @@
 import { injectable } from 'inversify';
-import * as _ from 'lodash';
 import { Effects, loop } from 'redux-loop';
 
-import { ReducerContributorDepth1 } from '../../sharedModels/reducers';
+import { ReducerContributorDepth2 } from '../../sharedModels/reducers';
 import { CHANGE_SEARCH_PHRASE, SEARCH_LIBRARIES, searchLibrariesSuccess } from './actions';
-import { SearchApi, SearchApiResults } from './api';
-import { SearchState } from './model';
+import { SearchApi, SearchApiResponse, SearchApiResult } from './api';
 
 @injectable()
-export class ChangeSearchPhraseReducer implements ReducerContributorDepth1<string, 'search'> {
+export class ChangeSearchPhraseReducer implements ReducerContributorDepth2<string, 'search', 'phrase'> {
     public readonly actionType = CHANGE_SEARCH_PHRASE;
-    public readonly selector = 'search';
+    public readonly selector: ['search', 'phrase'] = ['search', 'phrase'];
 
     constructor(
         private api: SearchApi,
     ) { }
 
-    public reduce(model: SearchState, phrase: string) {
-        const result = _.clone(model);
-        result.phrase = phrase;
-        return loop(result, this.effect(phrase));
+    public reduce(_0: string, phrase: string) {
+        return loop(phrase, this.effect(phrase));
     }
 
     private effect(phrase: string) {
@@ -34,13 +30,11 @@ export class ChangeSearchPhraseReducer implements ReducerContributorDepth1<strin
 }
 
 @injectable()
-export class SearchLibrariesSuccessReducer implements ReducerContributorDepth1<SearchApiResults, 'search'> {
+export class SearchLibrariesSuccessReducer implements ReducerContributorDepth2<SearchApiResponse, 'search', 'results'> {
     public readonly actionType = SEARCH_LIBRARIES.succeed;
-    public readonly selector = 'search';
+    public readonly selector: ['search', 'results'] = ['search', 'results'];
 
-    public reduce(model: SearchState, results: SearchApiResults) {
-        const result = _.clone(model);
-        result.results = results.results;
-        return result;
+    public reduce(_0: SearchApiResult[], response: SearchApiResponse) {
+        return response.results;
     }
 }

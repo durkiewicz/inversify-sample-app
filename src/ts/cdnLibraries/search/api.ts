@@ -5,15 +5,15 @@ export interface SearchApiResult {
     name: string;
 }
 
-export interface SearchApiResults {
+export interface SearchApiResponse {
     total: number;
     results: SearchApiResult[];
 }
 
 @injectable()
 export class SearchApi {
-    public search(phrase: string): Promise<SearchApiResults> {
+    public search(phrase: string): Promise<SearchApiResponse> {
         return fetch('https://api.cdnjs.com/libraries?search=' + encodeURIComponent(phrase))
-            .then(res => res.json() as Promise<SearchApiResults>);
+            .then(res => res.json() as Promise<SearchApiResponse>);
     }
 }
